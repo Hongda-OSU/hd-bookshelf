@@ -18,6 +18,21 @@
   color-scheme: dark;
 }
 
+/* No text selection and no image dragging anywhere on the site. */
+html {
+  -webkit-user-select: none;
+  user-select: none;
+}
+img {
+  -webkit-user-drag: none;
+}
+/* Safari won't let you type into an input that can't be selected. */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 body {
   margin: 0;
   background: var(--bg);
