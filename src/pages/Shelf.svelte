@@ -4,6 +4,7 @@
   import MonthChart from '../lib/components/MonthChart.svelte'
   import SiteHeader from '../lib/components/SiteHeader.svelte'
   import ReadingCard from '../lib/components/ReadingCard.svelte'
+  import { byFinishedDesc, byReadingRecency } from '../lib/order'
 
   let { books }: { books: IndexEntry[] } = $props()
 
@@ -45,22 +46,8 @@
     return !q || `${b.title} ${b.author ?? ''}`.toLowerCase().includes(q)
   }
 
-  const readingShown = $derived(
-    reading
-      .filter(matches)
-      .sort((a, b) =>
-        (b.lastAddedAt ?? b.dateStarted ?? '').localeCompare(
-          a.lastAddedAt ?? a.dateStarted ?? '',
-        ),
-      ),
-  )
-  const finishedShown = $derived(
-    finished
-      .filter(matches)
-      .sort((a, b) =>
-        (b.dateFinished ?? '').localeCompare(a.dateFinished ?? ''),
-      ),
-  )
+  const readingShown = $derived(reading.filter(matches).sort(byReadingRecency))
+  const finishedShown = $derived(finished.filter(matches).sort(byFinishedDesc))
   // Per-status counts under the current category and search.
   const counts = $derived<Record<StatusFilter, number>>({
     all: books.filter(matches).length,
