@@ -5,7 +5,7 @@
 </script>
 
 <header>
-  <a class="brand" href="#/">Hongda's Shelf</a>
+  <a class="brand" href="#/">HD Bookshelf</a>
   {@render children?.()}
 </header>
 
@@ -16,12 +16,15 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px 16px;
-    padding: 22px 0;
+    padding: 18px 0;
     border-bottom: 1px solid var(--line);
   }
   .brand {
-    font: 600 18px/1 var(--serif);
-    letter-spacing: -0.01em;
-    padding: 10px 0;
+    padding: 14px 0;
+    /* Wordmark: written "HD Bookshelf" in markup so screen readers
+       say it naturally; shown in caps. */
+    font: 600 14px/1 var(--sans);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 </style>

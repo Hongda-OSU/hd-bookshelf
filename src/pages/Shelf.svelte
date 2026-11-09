@@ -2,8 +2,8 @@
   import type { IndexEntry, Status } from '../lib/book'
   import BookTile from '../lib/components/BookTile.svelte'
   import MonthChart from '../lib/components/MonthChart.svelte'
-  import ReadingCard from '../lib/components/ReadingCard.svelte'
   import SiteHeader from '../lib/components/SiteHeader.svelte'
+  import ReadingCard from '../lib/components/ReadingCard.svelte'
 
   let { books }: { books: IndexEntry[] } = $props()
 
@@ -61,6 +61,12 @@
         (b.dateFinished ?? '').localeCompare(a.dateFinished ?? ''),
       ),
   )
+  // Per-status counts under the current category and search.
+  const counts = $derived<Record<StatusFilter, number>>({
+    all: books.filter(matches).length,
+    reading: reading.filter(matches).length,
+    finished: finished.filter(matches).length,
+  })
   const showReading = $derived(status !== 'finished' && readingShown.length > 0)
   const showFinished = $derived(
     status !== 'reading' && finishedShown.length > 0,
@@ -69,19 +75,25 @@
 
 <div class="container">
   <SiteHeader>
-    <a class="nav" href="https://github.com/Hongda-OSU/hd-bookshelf">GitHub</a>
+    <a class="nav" href="https://github.com/Hongda-OSU/hd-bookshelf">
+      <!-- GitHub mark from Octicons (MIT) -->
+      <svg aria-hidden="true" viewBox="0 0 16 16">
+        <path
+          d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"
+        ></path>
+      </svg>
+      <span class="visually-hidden">GitHub</span>
+    </a>
   </SiteHeader>
 
   <section class="hero" aria-label="今年概览">
-    <div>
-      <p class="eyebrow">Reading log · {year}</p>
-      <h1>
-        Books I finished, <em>and the lines I kept from them.</em>
-      </h1>
-      <p class="lede">
-        每本书留下读完的月份、一句推荐，和读的时候划下来的句子。
-      </p>
-    </div>
+    <!-- Break after the comma so no line starts with the italic "f",
+         whose swash hangs past the left edge. -->
+    <h1>
+      Books I finished,<br />
+      <em>and the lines I kept from them.</em>
+    </h1>
+    <p class="lede">每本书留下读完的月份、一句推荐，和读的时候划下来的句子。</p>
     <dl class="stats">
       <div>
         <dt>本读完（{year}）</dt>
@@ -106,12 +118,14 @@
         <button
           type="button"
           aria-pressed={status === value}
-          onclick={() => (status = value)}>{label}</button
+          onclick={() => (status = value)}
+          >{label}<span class="n">{counts[value]}</span></button
         >
       {/each}
     </div>
     <div class="cats" role="group" aria-label="分类">
-      {#each [ALL, ...categories] as name (name)}
+      {#each [ALL, ...categories] as name, i (name)}
+        {#if i > 0}<span class="sep" aria-hidden="true">/</span>{/if}
         <button
           type="button"
           aria-pressed={category === name}
@@ -171,46 +185,64 @@
 </div>
 
 <style>
+  /* Icon-only link; padding keeps a 44px touch target. */
   .nav {
-    font-size: 13px;
+    display: inline-flex;
+    padding: 12px;
+    margin-right: -12px;
     color: var(--muted);
-    padding: 10px 12px;
     border-radius: 6px;
+  }
+  .nav svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
   }
   .nav:hover {
     color: var(--text);
   }
 
+  /* Title spans the full width; lede and stats share the row below it,
+     centred on each other. */
   .hero {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-    gap: 32px 48px;
-    align-items: end;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+    grid-template-areas:
+      'title title'
+      'lede stats';
+    column-gap: 48px;
+    align-items: center;
     padding: 56px 0 36px;
   }
-  .eyebrow {
-    margin: 0 0 18px;
-    font: 500 12px/1 var(--mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
+  @media (max-width: 760px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'title' 'lede' 'stats';
+    }
+    .hero .stats {
+      margin-top: 28px;
+    }
   }
   h1 {
+    grid-area: title;
     margin: 0;
     font: 500 clamp(40px, 5.4vw, 66px) / 1.03 var(--serif);
-    letter-spacing: -0.025em;
+    letter-spacing: -0.04em;
   }
   h1 em {
     color: var(--muted);
   }
   .lede {
+    grid-area: lede;
     margin: 18px 0 0;
     max-width: 46ch;
-    color: var(--muted);
-    font-size: 16px;
+    color: #e6b48a;
+    font-size: 19px;
+    line-height: 1.6;
   }
   .stats {
-    margin: 0;
+    grid-area: stats;
+    margin: 36px 0 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     border-top: 1px solid var(--line-strong);
@@ -252,50 +284,75 @@
     background: var(--bg);
     border-bottom: 1px solid var(--line);
   }
+  /* Plain text toggles with a count; the active one brightens. */
   .segments {
     display: flex;
-    border: 1px solid var(--line-strong);
-    border-radius: 8px;
-    padding: 2px;
+    gap: 24px;
   }
   .segments button {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
     border: 0;
     background: transparent;
-    padding: 8px 14px;
-    min-height: 36px;
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--muted);
+    padding: 10px 0;
+    min-height: 40px;
+    font-size: 15px;
+    color: var(--faint);
     cursor: pointer;
   }
+  .segments button:hover {
+    color: var(--text);
+  }
+  .segments .n {
+    font: 400 11px var(--mono);
+    color: var(--faint);
+  }
   .segments button[aria-pressed='true'] {
-    background: var(--surface-raised);
     color: var(--text);
     font-weight: 500;
   }
+  .segments button[aria-pressed='true'] .n {
+    color: var(--accent);
+  }
+  /* Slash-separated text; the active one gets a small dot underneath. */
   .cats {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    align-items: center;
+  }
+  .cats .sep {
+    margin: 0 12px;
+    font-size: 13px;
+    color: rgba(236, 232, 225, 0.2);
   }
   .cats button {
-    border: 1px solid rgba(236, 232, 225, 0.12);
+    position: relative;
+    border: 0;
     background: transparent;
-    border-radius: 999px;
-    padding: 6px 12px;
-    min-height: 32px;
-    font-size: 12px;
-    color: var(--muted);
+    padding: 10px 0;
+    min-height: 40px;
+    font-size: 13px;
+    color: var(--faint);
     cursor: pointer;
   }
   .cats button:hover {
     color: var(--text);
   }
   .cats button[aria-pressed='true'] {
-    border-color: var(--accent);
-    background: var(--accent-soft);
     color: var(--text);
     font-weight: 500;
+  }
+  .cats button[aria-pressed='true']::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--accent);
   }
   .search {
     position: relative;
@@ -322,6 +379,11 @@
     border-radius: 8px;
     padding: 8px 10px 8px 32px;
     font-size: 13px;
+  }
+  /* No accent ring; a lighter border still shows where focus is. */
+  .search input:focus {
+    outline: none;
+    border-color: rgba(236, 232, 225, 0.4);
   }
   .search input::placeholder {
     color: var(--faint);
