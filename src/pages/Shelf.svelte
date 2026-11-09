@@ -281,7 +281,10 @@
     justify-content: space-between;
     padding: 14px 0;
     margin-top: 40px;
-    background: var(--bg);
+    /* See-through so the page glow shows; blur keeps it readable when stuck. */
+    background: rgba(15, 15, 17, 0.6);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--line);
   }
   /* Plain text toggles with a count; the active one brightens. */
