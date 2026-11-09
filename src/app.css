@@ -36,6 +36,7 @@ textarea {
 
 body {
   margin: 0;
+  overflow-x: clip;
   /* Warm glow from the right edge over a near-black base. */
   background:
     radial-gradient(

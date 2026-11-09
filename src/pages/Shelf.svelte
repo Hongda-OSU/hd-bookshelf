@@ -58,6 +58,26 @@
   const showFinished = $derived(
     status !== 'reading' && finishedShown.length > 0,
   )
+
+  // The toolbar gets a backdrop only once it is stuck to the top: the
+  // sentinel sits right above it, so once it has scrolled above the viewport
+  // the toolbar is stuck.
+  let sentinel = $state<HTMLElement>()
+  let stuck = $state(false)
+  $effect(() => {
+    const el = sentinel
+    if (!el) return
+    const update = () => {
+      stuck = el.getBoundingClientRect().top < 0
+    }
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  })
 </script>
 
 <div class="container">
@@ -89,7 +109,8 @@
 
   <MonthChart books={finished} {year} currentMonth={now.getMonth() + 1} />
 
-  <div class="toolbar">
+  <div class="sentinel" bind:this={sentinel} aria-hidden="true"></div>
+  <div class="toolbar" class:stuck>
     <div class="segments" role="group" aria-label="状态">
       {#each STATUS_OPTIONS as [value, label] (value)}
         <button
@@ -240,12 +261,27 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 0;
-    margin-top: 40px;
-    /* See-through so the page glow shows; blur keeps it readable when stuck. */
-    background: rgba(15, 15, 17, 0.6);
+    border-bottom: 1px solid var(--line);
+  }
+  .sentinel {
+    height: 1px;
+    margin-top: 39px;
+  }
+  /* Full-bleed backdrop, shown only while stuck so the glow isn't boxed in
+     when the toolbar sits in the page. */
+  .toolbar::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(50% - 50vw);
+    z-index: -1;
+    background: rgba(15, 15, 17, 0.72);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--line);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .toolbar.stuck::before {
+    opacity: 1;
   }
   /* Plain text toggles with a count; the active one brightens. */
   .segments {
