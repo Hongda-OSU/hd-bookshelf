@@ -177,7 +177,6 @@
     <span>
       数据来自仓库里的 <code>data/books/*.json</code>，用 <code>/book</code> 录入
     </span>
-    <span>最后更新 {__BUILD_DATE__}</span>
   </footer>
 </div>
 
