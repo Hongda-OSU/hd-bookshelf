@@ -39,6 +39,13 @@ the `/book` skill; the site never writes.
 - Asset URLs must respect Vite `base` (`/hd-bookshelf/`); don't hardcode `/`.
 - Ask before adding a new dependency or changing the book JSON schema.
 
+## Gotchas
+
+- Routing is hash-based (`#/book/<id>`) in `src/App.svelte`. The shelf stays
+  mounted (hidden) while a book is open so its filters survive.
+- Scroll with `jumpTo()` from `src/lib/smooth-scroll.ts`, never
+  `window.scrollTo`: Lenis caches the page height and clamps stale jumps.
+
 ## Product spec
 
 The PRD lives in Notion ("读书记录站 · 产品文档"). The design mock (shelf page +
