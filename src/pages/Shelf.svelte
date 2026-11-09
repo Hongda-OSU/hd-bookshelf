@@ -146,7 +146,6 @@
       <div class="group-head">
         <h2>在读</h2>
         <span class="count">{readingShown.length} 本</span>
-        <span class="hint">读的时候随时加句子，读完再写推荐</span>
       </div>
       <div class="reading-grid">
         {#each readingShown as book (book.id)}
@@ -407,11 +406,6 @@
   .count {
     font: 400 12px/1 var(--mono);
     color: var(--muted);
-  }
-  .hint {
-    margin-left: auto;
-    font-size: 12px;
-    color: var(--faint);
   }
   .reading-grid {
     display: grid;
