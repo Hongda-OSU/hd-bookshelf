@@ -21,7 +21,6 @@
 <section aria-labelledby="month-chart-title">
   <div class="head">
     <h2 id="month-chart-title">每月读完</h2>
-    <span class="caption">{year} · 每一格是一本书</span>
   </div>
   <div class="grid">
     {#each months as m, i (i)}
@@ -62,10 +61,6 @@
   h2 {
     margin: 0;
     font: 500 13px/1 var(--sans);
-  }
-  .caption {
-    font: 400 12px/1 var(--mono);
-    color: var(--muted);
   }
   .grid {
     display: grid;
