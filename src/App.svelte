@@ -7,7 +7,7 @@
   import Shelf from './pages/Shelf.svelte'
 
   const books = index as IndexEntry[]
-  const SITE = 'HD Bookshelf'
+  const SITE = 'hd-bookshelf'
 
   // Hash routes: "#/book/<id>" is a book page, anything else is the shelf.
   function parse(hash: string): string | null {

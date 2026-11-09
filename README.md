@@ -1,6 +1,6 @@
-<img src="assets/icon.png" width="128" height="128" alt="HD Bookshelf icon: a pixel-art navy book with a smiling face and a red bookmark">
+<img src="assets/icon.png" width="128" height="128" alt="hd-bookshelf icon: a pixel-art navy book with a smiling face and a red bookmark">
 
-# HD Bookshelf
+# hd-bookshelf
 
 A personal bookshelf of the books I've read: covers, the month I finished each
 one, why I'd recommend it, and the sentences I kept along the way.

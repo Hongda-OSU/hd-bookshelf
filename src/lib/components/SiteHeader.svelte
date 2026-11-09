@@ -43,7 +43,8 @@
     flex: none;
     padding: 12px 0;
     /* Wordmark in Cormorant SC: capitals stay full height, lowercase renders
-       as small caps, like a book's title page. */
+       as small caps, like a book's title page. The site is "hd-bookshelf"
+       elsewhere (tab title, README); the header keeps this display form. */
     font:
       600 20px/1 'Cormorant SC',
       var(--serif);
