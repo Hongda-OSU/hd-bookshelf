@@ -20,6 +20,7 @@
 <div
   class="cover {size}"
   class:cjk={ph.cjk}
+  data-book={id}
   style:--cover-bg={ph.bg}
   style:--cover-ink={ph.ink}
   style:--cover-mark={ph.mark}

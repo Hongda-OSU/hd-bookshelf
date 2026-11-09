@@ -59,7 +59,7 @@
   {:else}
     <div class="layout">
       <aside>
-        <div class="cover">
+        <div class="cover" style:view-transition-name="book-cover">
           <Cover
             id={entry.id}
             title={entry.title}
