@@ -1,0 +1,14 @@
+{
+  "id": "compiler-from-scratch",
+  "title": "从零构建编译器",
+  "author": "许衡",
+  "category": "技术",
+  "status": "reading",
+  "dateStarted": "2026-11",
+  "sentences": [
+    {
+      "text": "先让程序跑起来，再让它跑得对，最后才让它跑得快。",
+      "addedAt": "2026-11-07"
+    }
+  ]
+}

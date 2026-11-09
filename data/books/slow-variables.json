@@ -1,0 +1,21 @@
+{
+  "id": "slow-variables",
+  "title": "慢变量",
+  "author": "林知远",
+  "category": "商业",
+  "status": "finished",
+  "dateFinished": "2026-09",
+  "recommendation": "提醒我少盯每天的波动，多看那几个几年才变一次的量。",
+  "sentences": [
+    {
+      "text": "快变量决定今天的心情，慢变量决定十年后的位置。",
+      "addedAt": "2026-08-30"
+    },
+    {
+      "text": "如果一个判断每周都要改，它大概不是判断，只是反应。",
+      "note": "复盘时可以拿来自查",
+      "location": "p. 77",
+      "addedAt": "2026-09-12"
+    }
+  ]
+}

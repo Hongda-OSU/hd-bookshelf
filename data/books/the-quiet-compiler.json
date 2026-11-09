@@ -1,0 +1,30 @@
+{
+  "id": "the-quiet-compiler",
+  "title": "The Quiet Compiler",
+  "author": "Mara Ellison",
+  "isbn": "9780000001011",
+  "category": "技术",
+  "status": "finished",
+  "dateStarted": "2026-09",
+  "dateFinished": "2026-10",
+  "recommendation": "把「写编译器」拆成一个周末就能跑通的小步骤。读完以后，我第一次觉得解析器不是黑魔法。",
+  "sentences": [
+    {
+      "text": "Start with the smallest language that can still surprise you.",
+      "note": "适合当 side project 的原则",
+      "location": "p. 12",
+      "addedAt": "2026-09-21"
+    },
+    {
+      "text": "A parser is a promise that every string has exactly one meaning, or none.",
+      "note": "写表达式解析题时一直没想清楚的就是这句",
+      "location": "p. 41",
+      "addedAt": "2026-09-28"
+    },
+    {
+      "text": "Error messages are the part of the compiler your users read most.",
+      "location": "p. 188",
+      "addedAt": "2026-10-09"
+    }
+  ]
+}
