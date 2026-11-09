@@ -1,10 +1,11 @@
 <script lang="ts">
-  import type { IndexEntry, Status } from '../lib/book'
+  import type { IndexEntry, Quote, Status } from '../lib/book'
   import BookTile from '../lib/components/BookTile.svelte'
   import MonthChart from '../lib/components/MonthChart.svelte'
   import SiteHeader from '../lib/components/SiteHeader.svelte'
   import ReadingCard from '../lib/components/ReadingCard.svelte'
   import { byFinishedDesc, byReadingRecency } from '../lib/order'
+  import { bookHref } from '../lib/format'
 
   let { books }: { books: IndexEntry[] } = $props()
 
@@ -62,6 +63,17 @@
   // The toolbar gets a backdrop only once it is stuck to the top: the
   // sentinel sits right above it, so once it has scrolled above the viewport
   // the toolbar is stuck.
+  // Footer: one saved sentence picked at random; the sentence list is its own
+  // chunk, fetched after the shelf has rendered.
+  let quote = $state<Quote | null>(null)
+  const CJK = /[\u3400-\u9fff]/
+  $effect(() => {
+    import('../generated/quotes.json').then((m) => {
+      const all = m.default as Quote[]
+      if (all.length > 0) quote = all[Math.floor(Math.random() * all.length)]
+    })
+  })
+
   let sentinel = $state<HTMLElement>()
   let stuck = $state(false)
   $effect(() => {
@@ -177,6 +189,18 @@
     <span>
       数据来自仓库里的 <code>data/books/*.json</code>，用 <code>/book</code> 录入
     </span>
+    {#if quote}
+      <p class="quote" class:cjk={CJK.test(quote.text)}>
+        <span class="quote-text"
+          >{CJK.test(quote.text)
+            ? `「${quote.text}」`
+            : `“${quote.text}”`}</span
+        >
+        <span class="source"
+          >— <a href={bookHref(quote.id)}>{quote.title}</a></span
+        >
+      </p>
+    {/if}
   </footer>
 </div>
 
@@ -434,8 +458,40 @@
     flex-wrap: wrap;
     gap: 8px 24px;
     justify-content: space-between;
+    align-items: baseline;
     font-size: 12px;
     color: var(--faint);
+  }
+  .quote {
+    margin: 0;
+    max-width: 52%;
+    text-align: right;
+  }
+  @media (max-width: 760px) {
+    .quote {
+      max-width: none;
+      text-align: left;
+    }
+  }
+  .quote-text {
+    font: italic 400 14px/1.5 var(--serif);
+    color: var(--muted);
+  }
+  /* Chinese has no italic; keep it upright. */
+  .quote.cjk .quote-text {
+    font-style: normal;
+    font-family: var(--serif-cjk);
+    font-size: 13px;
+  }
+  /* Keep the dash with the title so a line never ends on "—". */
+  .source {
+    white-space: nowrap;
+  }
+  .quote a {
+    color: var(--muted);
+  }
+  .quote a:hover {
+    color: var(--apricot);
   }
   code {
     font: 400 12px var(--mono);

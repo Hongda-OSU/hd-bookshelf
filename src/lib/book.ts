@@ -59,3 +59,10 @@ export type IndexEntry = {
   lastSentence?: string
   lastAddedAt?: string
 }
+
+/** One saved sentence with its book, for the shelf footer's random pick. */
+export type Quote = {
+  text: string
+  id: string
+  title: string
+}

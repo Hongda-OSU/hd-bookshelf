@@ -1,12 +1,19 @@
-// Validate every data/books/*.json and write src/generated/index.json.
+// Validate every data/books/*.json, then write src/generated/index.json and quotes.json.
 // Exits non-zero on any invalid book so a bad file can never be deployed.
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { BookSchema, type Book, type IndexEntry } from '../src/lib/book.ts'
+import {
+  BookSchema,
+  type Book,
+  type IndexEntry,
+  type Quote,
+} from '../src/lib/book.ts'
 
 const root = path.resolve(import.meta.dirname, '..')
 const booksDir = path.join(root, 'data/books')
 const outFile = path.join(root, 'src/generated/index.json')
+// Kept out of the index so the shelf doesn't load every sentence up front.
+const quotesFile = path.join(root, 'src/generated/quotes.json')
 
 const errors: string[] = []
 const books: Book[] = []
@@ -69,4 +76,11 @@ function toEntry(book: Book): IndexEntry {
 
 await mkdir(path.dirname(outFile), { recursive: true })
 await writeFile(outFile, JSON.stringify(books.map(toEntry), null, 2) + '\n')
-console.log(`✓ ${books.length} book(s) → src/generated/index.json`)
+
+const quotes: Quote[] = books.flatMap((b) =>
+  b.sentences.map((s) => ({ text: s.text, id: b.id, title: b.title })),
+)
+await writeFile(quotesFile, JSON.stringify(quotes, null, 2) + '\n')
+console.log(
+  `✓ ${books.length} book(s), ${quotes.length} sentence(s) → src/generated/`,
+)

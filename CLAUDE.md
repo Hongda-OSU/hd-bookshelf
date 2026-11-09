@@ -33,7 +33,7 @@ the `/book` skill; the site never writes.
 - Each book has exactly one `category` (a string, not an array).
 - Never generate or rewrite a recommendation with AI. It is always my own words;
   if I don't give one, leave it empty.
-- `src/generated/index.json` is generated (gitignored). Never hand-edit it.
+- `src/generated/` (index.json, quotes.json) is generated and gitignored. Never hand-edit it.
   `pnpm dev` doesn't watch `data/`; rerun `pnpm build:index` after editing a book.
 - The `/book` skill commits but never pushes. I push myself.
 - Asset URLs must respect Vite `base` (`/hd-bookshelf/`); don't hardcode `/`.
