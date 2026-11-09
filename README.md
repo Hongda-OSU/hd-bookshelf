@@ -1,3 +1,5 @@
+<img src="assets/icon.png" width="128" height="128" alt="Hongda's Shelf icon: a pixel-art stack of three books with a sprout growing on top">
+
 # Hongda's Shelf
 
 A personal bookshelf of the books I've read: covers, the month I finished each
