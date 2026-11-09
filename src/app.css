@@ -1,0 +1,58 @@
+:root {
+  --bg: #0f0f11;
+  --surface: #17171a;
+  --surface-raised: #26262b;
+  --text: #ece8e1;
+  --muted: #9b968d;
+  --faint: #85807a;
+  --line: rgba(236, 232, 225, 0.09);
+  --line-strong: rgba(236, 232, 225, 0.18);
+  --accent: #f0823c;
+  --accent-soft: rgba(240, 130, 60, 0.14);
+
+  --serif: Newsreader, 'Noto Serif SC', Georgia, serif;
+  --serif-cjk: 'Noto Serif SC', 'Songti SC', serif;
+  --sans: Inter, 'PingFang SC', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 15px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px) 80px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
