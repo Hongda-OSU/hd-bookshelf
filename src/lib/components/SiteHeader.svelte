@@ -41,12 +41,13 @@
   }
   .brand {
     flex: none;
-    padding: 14px 0;
-    /* Wordmark: written "HD Bookshelf" in markup so screen readers
-       say it naturally; shown in caps. */
-    font: 600 14px/1 var(--sans);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    padding: 12px 0;
+    /* Wordmark in Cormorant SC: capitals stay full height, lowercase renders
+       as small caps, like a book's title page. */
+    font:
+      600 20px/1 'Cormorant SC',
+      var(--serif);
+    letter-spacing: 0.06em;
   }
   .brand.parent {
     color: var(--muted);
