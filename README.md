@@ -22,7 +22,7 @@ one, why I'd recommend it, and the sentences I kept along the way.
 
 ### Prerequisites
 
-- Node.js 22+
+- Node.js 22.18+
 - pnpm 9+
 
 ### Installation

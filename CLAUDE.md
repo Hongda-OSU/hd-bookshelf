@@ -6,7 +6,7 @@ the `/book` skill; the site never writes.
 
 ## Stack
 
-- Runtime: Node 22+
+- Runtime: Node 22.18+ (scripts in `scripts/*.ts` run with native type stripping, no tsx)
 - Framework: Svelte 5 + Vite, TypeScript
 - Package manager: **pnpm** (not npm, not yarn)
 - Hosting: GitHub Pages via GitHub Actions, served under `/hd-bookshelf/`
@@ -14,23 +14,27 @@ the `/book` skill; the site never writes.
 
 ## Commands
 
-| Purpose      | Command             |
-| ------------ | ------------------- |
-| Install      | `pnpm install`      |
-| Dev server   | `pnpm dev`          |
-| Build        | `pnpm build`        |
-| Types        | `pnpm check`        |
-| Format       | `pnpm format`       |
-| Format check | `pnpm format:check` |
+| Purpose                          | Command             |
+| -------------------------------- | ------------------- |
+| Install                          | `pnpm install`      |
+| Dev server                       | `pnpm dev`          |
+| Build                            | `pnpm build`        |
+| Validate data + regenerate index | `pnpm build:index`  |
+| Types                            | `pnpm check`        |
+| Format                           | `pnpm format`       |
+| Format check                     | `pnpm format:check` |
 
 ## Rules
 
 - Before every commit run `pnpm format:check`, `pnpm check` and `pnpm build`.
   Do not commit if any fails. No ESLint in this project; don't add it.
+- The book schema is the zod `BookSchema` in `src/lib/book.ts`; types are inferred
+  from it. Frontend code imports types only, so zod stays out of the bundle.
 - Each book has exactly one `category` (a string, not an array).
 - Never generate or rewrite a recommendation with AI. It is always my own words;
   if I don't give one, leave it empty.
-- `index.json` is generated at build time. Never hand-edit it.
+- `src/generated/index.json` is generated (gitignored). Never hand-edit it.
+  `pnpm dev` doesn't watch `data/`; rerun `pnpm build:index` after editing a book.
 - The `/book` skill commits but never pushes. I push myself.
 - Asset URLs must respect Vite `base` (`/hd-bookshelf/`); don't hardcode `/`.
 - Ask before adding a new dependency or changing the book JSON schema.
