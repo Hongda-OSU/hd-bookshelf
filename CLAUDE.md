@@ -9,7 +9,8 @@ the `/book` skill; the site never writes.
 - Runtime: Node 22.18+ (scripts in `scripts/*.ts` run with native type stripping, no tsx)
 - Framework: Svelte 5 + Vite, TypeScript
 - Package manager: **pnpm** (not npm, not yarn)
-- Hosting: GitHub Pages via GitHub Actions, served under `/hd-bookshelf/`
+- Hosting: GitHub Pages, served under `/hd-bookshelf/`. Every push to `main`
+  runs `.github/workflows/deploy.yml` (format check, types, build, deploy).
 - Data: one JSON file per book in `data/books/<id>.json`; no backend, no database
 
 ## Commands
