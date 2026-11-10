@@ -12,7 +12,9 @@
       return {
         label,
         current: currentMonth === i + 1,
-        books: books.filter((b) => b.dateFinished === key),
+        books: books
+          .filter((b) => b.dateFinished === key)
+          .map((b) => ({ ...b, ph: placeholderCover(b.id, b.title) })),
       }
     }),
   )
@@ -32,8 +34,8 @@
               href={bookHref(b.id)}
               title={b.title}
               aria-label="{b.title}，{i + 1} 月读完"
-              style:--chip-bg={placeholderCover(b.id, b.title).bg}
-              style:--chip-mark={placeholderCover(b.id, b.title).mark}
+              style:--chip-bg={b.ph.bg}
+              style:--chip-mark={b.ph.mark}
             ></a>
           {/each}
         </div>
