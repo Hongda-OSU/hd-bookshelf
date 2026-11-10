@@ -58,6 +58,30 @@
     U+2215, U+FEFF, U+FFFD;
 }
 
+/* Georgia resized to Newsreader's metrics, so text that paints before
+   Newsreader arrives keeps roughly its width and baseline and doesn't jump on
+   the swap. Newsreader has an optical-size axis (narrower when large), so the
+   widths were fitted to the hero headline at 40-66px, not at one size;
+   ascent/descent are Newsreader's divided by size-adjust. */
+@font-face {
+  font-family: 'Newsreader Fallback';
+  font-style: normal;
+  src: local('Georgia');
+  size-adjust: 101%;
+  ascent-override: 73.27%;
+  descent-override: 25.74%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Newsreader Fallback';
+  font-style: italic;
+  src: local('Georgia Italic'), local('Georgia-Italic');
+  size-adjust: 89%;
+  ascent-override: 83.15%;
+  descent-override: 29.21%;
+  line-gap-override: 0%;
+}
+
 :root {
   --bg: #0f0f11;
   --surface: #17171a;
@@ -71,7 +95,7 @@
   --accent-soft: rgba(240, 130, 60, 0.14);
   --apricot: #e6b48a;
 
-  --serif: Newsreader, 'Noto Serif SC', Georgia, serif;
+  --serif: Newsreader, 'Newsreader Fallback', 'Noto Serif SC', Georgia, serif;
   --serif-cjk: 'Noto Serif SC', 'Songti SC', serif;
   --sans: Inter, 'PingFang SC', system-ui, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
