@@ -1,17 +1,18 @@
 # hd-bookshelf
 
 A read-only personal bookshelf site: each book has a cover, finish month, a
-recommendation, and sentences I saved while reading. Data is written only by
-the `/book` skill; the site never writes.
+recommendation, and sentences I saved while reading. Books are JSON files in
+the repo (added by hand for now; a `/book` skill is planned). The site never
+writes data.
 
 ## Stack
 
 - Runtime: Node 22.18+ (scripts in `scripts/*.ts` run with native type stripping, no tsx)
-- Framework: Svelte 5 + Vite, TypeScript
-- Package manager: **pnpm** (not npm, not yarn)
+- Framework: Svelte 5 + Vite, TypeScript; Lenis for smooth scrolling
+- Package manager: **pnpm** 12, pinned by `packageManager` (not npm, not yarn)
 - Hosting: GitHub Pages, served under `/hd-bookshelf/`. Every push to `main`
   runs `.github/workflows/deploy.yml` (format check, types, build, deploy).
-- Data: one JSON file per book in `data/books/<id>.json`; no backend, no database
+- Data: one JSON file per book in `data/books/<id>.json`, schema in zod; no backend
 
 ## Commands
 
@@ -39,19 +40,34 @@ the `/book` skill; the site never writes.
 - The `/book` skill commits but never pushes. I push myself.
 - Asset URLs must respect Vite `base` (`/hd-bookshelf/`); don't hardcode `/`.
 - Ask before adding a new dependency or changing the book JSON schema.
+- UI changes: touch only what I asked for. For anything visual, show rendered
+  options first and let me pick.
 
 ## Gotchas
 
 - Routing is hash-based (`#/book/<id>`) in `src/App.svelte`. The shelf stays
   mounted (hidden) while a book is open so its filters survive.
 - Scroll with `jumpTo()` from `src/lib/smooth-scroll.ts`, never
-  `window.scrollTo`: Lenis caches the page height and clamps stale jumps.
+  `window.scrollTo`: it stops a Lenis ease still in flight and drops trailing
+  trackpad momentum, either of which otherwise scrolls the new page.
+- The shelf→book cover morph uses the view-transition name `book-cover`; only
+  one visible element may hold it at a time (`nameShelfCover` in `App.svelte`).
+- Chinese text has no italic: anything set in italic needs an upright CJK
+  fallback (see `.cjk` classes), or the browser slants the glyphs.
+- The site is named `hd-bookshelf` (tab title, README); the header wordmark
+  deliberately shows "HD Bookshelf" in Cormorant SC.
+- Covers: remote Open Library URLs by cover id. Prefer clean publisher scans;
+  dark user photos vanish on the dark page. Google Books' keyless API is often
+  over quota (HTTP 429).
+- Headless Chrome with `--virtual-time-budget` never delivers scroll events or
+  finishes view transitions. To test those, drive real-time headless Chrome
+  over CDP (`--remote-debugging-port` + Node's built-in WebSocket).
 
 ## Product spec
 
-The PRD lives in Notion ("读书记录站 · 产品文档"). The design mock (shelf page +
-book page) is a claude.ai Design artifact. Treat the PRD as the source of truth
-for scope; the mock for layout and visual style.
+The PRD lives in Notion ("读书记录站 · 产品文档"): scope, schema and milestones.
+The original claude.ai design mock is outdated; the current UI is the reference
+for layout and visual style.
 
 ## When unsure
 
