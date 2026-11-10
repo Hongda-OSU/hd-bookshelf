@@ -4,6 +4,8 @@
   import Cover from './Cover.svelte'
 
   let { book }: { book: IndexEntry } = $props()
+  // Chinese has no italic; a CJK sentence stays upright.
+  const CJK = /[\u3400-\u9fff]/
 </script>
 
 <a class="tile" href={bookHref(book.id)}>
@@ -19,11 +21,19 @@
   <div>
     <p class="title">{book.title}</p>
     {#if book.author}<p class="author">{book.author}</p>{/if}
+    <!-- Only reading books carry it (see build-index): the latest sentence. -->
+    {#if book.lastSentence}
+      <p class="quote" class:cjk={CJK.test(book.lastSentence)}>
+        {book.lastSentence}
+      </p>
+    {/if}
     <div class="meta">
       <span>
         {book.dateFinished
           ? `${dotMonth(book.dateFinished)} · `
-          : ''}{book.category}
+          : book.dateStarted
+            ? `${dotMonth(book.dateStarted)} 开始 · `
+            : ''}{book.category}
       </span>
       <span class="count">{book.sentenceCount} 句</span>
     </div>
@@ -58,6 +68,23 @@
     margin: 2px 0 0;
     font-size: 12.5px;
     color: var(--muted);
+  }
+  .quote {
+    display: -webkit-box;
+    margin: 8px 0 0;
+    padding-left: 8px;
+    border-left: 2px solid var(--accent);
+    font: italic 400 14px/1.45 var(--serif);
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .quote.cjk {
+    font-style: normal;
+    font-family: var(--serif-cjk);
+    font-size: 13px;
+    line-height: 1.55;
   }
   .meta {
     display: flex;

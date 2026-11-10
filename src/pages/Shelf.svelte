@@ -3,7 +3,6 @@
   import BookTile from '../lib/components/BookTile.svelte'
   import MonthChart from '../lib/components/MonthChart.svelte'
   import SiteHeader from '../lib/components/SiteHeader.svelte'
-  import ReadingCard from '../lib/components/ReadingCard.svelte'
   import { byFinishedDesc, byReadingRecency } from '../lib/order'
   import { bookHref } from '../lib/format'
 
@@ -168,9 +167,9 @@
         <h2>在读</h2>
         <span class="count">{readingShown.length} 本</span>
       </div>
-      <div class="reading-grid">
+      <div class="book-grid">
         {#each readingShown as book (book.id)}
-          <ReadingCard {book} />
+          <BookTile {book} />
         {/each}
       </div>
     </section>
@@ -182,7 +181,7 @@
         <h2>读完</h2>
         <span class="count">{finishedShown.length} 本 · 按读完月份</span>
       </div>
-      <div class="finished-grid">
+      <div class="book-grid">
         {#each finishedShown as book (book.id)}
           <BookTile {book} />
         {/each}
@@ -439,12 +438,7 @@
     font: 400 12px/1 var(--mono);
     color: var(--muted);
   }
-  .reading-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
-    gap: 20px;
-  }
-  .finished-grid {
+  .book-grid {
     display: grid;
     grid-template-columns: repeat(
       auto-fill,
