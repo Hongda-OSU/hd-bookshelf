@@ -1,6 +1,8 @@
 <script lang="ts">
   import { tick } from 'svelte'
   import type { IndexEntry } from './lib/book'
+  import SurpriseWall from './lib/components/SurpriseWall.svelte'
+  import { bookHref } from './lib/format'
   import { jumpTo } from './lib/smooth-scroll'
   import index from './generated/index.json'
   import Book from './pages/Book.svelte'
@@ -96,17 +98,71 @@
     nameShelfCover(null)
   }
 
+  // Surprise mode (SurpriseWall): a hidden, draggable wall of every cover.
+  // Opens with the Konami code, or five quick taps on the header wordmark.
+  let surprise = $state(false)
+  const KONAMI =
+    'ArrowUp ArrowUp ArrowDown ArrowDown ArrowLeft ArrowRight ArrowLeft ArrowRight b a'
+  let recentKeys: string[] = []
+  let brandTaps: number[] = []
+
+  function onKeyDown(e: KeyboardEvent): void {
+    if (surprise) return
+    // Typing in the search box is not a cheat code.
+    const t = e.target
+    if (
+      t instanceof HTMLElement &&
+      t.closest('input, textarea, [contenteditable]')
+    )
+      return
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key
+    recentKeys = [...recentKeys, key].slice(-10)
+    if (recentKeys.join(' ') === KONAMI) {
+      recentKeys = []
+      surprise = true
+    }
+  }
+
+  function onClick(e: MouseEvent): void {
+    if (surprise) return
+    if (!(e.target instanceof Element) || !e.target.closest('[data-brand]'))
+      return
+    const now = e.timeStamp
+    brandTaps = [...brandTaps.filter((t) => now - t < 1500), now]
+    if (brandTaps.length >= 5) {
+      brandTaps = []
+      surprise = true
+    }
+  }
+
+  function pickFromWall(id: string): void {
+    surprise = false
+    const href = bookHref(id)
+    if (location.hash !== href) location.hash = href
+  }
+
   $effect(() => {
     const entry = bookId ? books.find((b) => b.id === bookId) : undefined
     document.title = entry ? `${entry.title} · ${SITE}` : SITE
   })
 </script>
 
-<svelte:window onhashchange={onHashChange} />
+<svelte:window
+  onhashchange={onHashChange}
+  onkeydown={onKeyDown}
+  onclick={onClick}
+/>
 
 <div hidden={bookId !== null} bind:this={shelfEl}><Shelf {books} /></div>
 {#if bookId !== null}
   {#key bookId}
     <Book id={bookId} {books} />
   {/key}
+{/if}
+{#if surprise}
+  <SurpriseWall
+    {books}
+    onpick={pickFromWall}
+    onclose={() => (surprise = false)}
+  />
 {/if}

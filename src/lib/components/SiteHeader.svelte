@@ -5,7 +5,8 @@
 
 <header>
   <div class="crumb">
-    <a class="brand" class:parent={current} href="#/">HD Bookshelf</a>
+    <a class="brand" class:parent={current} href="#/" data-brand>HD Bookshelf</a
+    >
     {#if current}
       <span class="sep" aria-hidden="true">/</span>
       <span class="current" aria-current="page">{current}</span>
