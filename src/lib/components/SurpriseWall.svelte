@@ -18,6 +18,14 @@
   const TAU = 0.18 // seconds the glide lags behind the target
   const KEY_STEP = 160
   const CLICK_SLOP = 6 // px of movement that still counts as a click
+  // The wall opens under the pointer that tapped the wordmark; further fast
+  // taps there would land on a cover and open it. Picks are ignored until
+  // the covers have popped in, and for as long as the tapping keeps going:
+  // each press inside the guard pushes it on, so only a deliberate tap
+  // after a pause opens a book.
+  const PICK_DELAY = 800 // ms after opening
+  const TAP_PAUSE = 400 // ms of quiet needed after a burst of taps
+  let pickGuard = performance.now() + PICK_DELAY
 
   type Geometry = {
     tw: number
@@ -155,6 +163,8 @@
 
   function onpointerdown(e: PointerEvent): void {
     if (e.button !== 0) return
+    const now = performance.now()
+    if (now < pickGuard) pickGuard = Math.max(pickGuard, now + TAP_PAUSE)
     down = { x: e.clientX, y: e.clientY }
     moved = 0
     root.setPointerCapture(e.pointerId)
@@ -173,6 +183,7 @@
     if (!down) return
     down = null
     if (moved >= CLICK_SLOP) return
+    if (performance.now() < pickGuard) return
     const hit = document
       .elementFromPoint(e.clientX, e.clientY)
       ?.closest<HTMLElement>('[data-pick]')
