@@ -53,7 +53,7 @@
 
   {#if !entry}
     <div class="missing">
-      <p>书架上没有这本书。</p>
+      <p tabindex="-1" data-page-title>书架上没有这本书。</p>
       <a href="#/">回到书架</a>
     </div>
   {:else}
@@ -106,7 +106,7 @@
               : ''}
           {/if}
         </p>
-        <h1>{entry.title}</h1>
+        <h1 tabindex="-1" data-page-title>{entry.title}</h1>
         {#if entry.author}
           <p class="author" class:cjk={CJK.test(entry.author)}>
             {CJK.test(entry.author)
@@ -262,6 +262,10 @@
     margin: 16px 0 8px -0.04em;
     font: 500 clamp(36px, 4.6vw, 56px) / 1.04 var(--serif);
     letter-spacing: -0.025em;
+  }
+  /* Focus lands here on navigation (App.svelte); it isn't a control, so no ring. */
+  [data-page-title]:focus {
+    outline: none;
   }
   /* Byline set like a title page. */
   .author {

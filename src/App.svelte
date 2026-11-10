@@ -16,8 +16,10 @@
   }
 
   let bookId = $state(parse(location.hash))
-  // The shelf stays mounted (filters survive); remember where it was scrolled.
+  // The shelf stays mounted (filters survive); remember where it was scrolled
+  // and which of its elements had focus (usually the book link just used).
   let shelfY = 0
+  let shelfFocus: HTMLElement | null = null
 
   // Shelf <-> book swaps run as a view transition: the book's cover on the
   // shelf morphs into the big cover on its page (and back). Browsers without
@@ -37,11 +39,45 @@
     if (hit) hit.style.viewTransitionName = SHARED
   }
 
+  /**
+   * The link that was activated disappears with the page it lived on, which
+   * drops keyboard focus to <body>. Put it somewhere meaningful instead: the
+   * book's title when opening a book; back on the shelf, the element that had
+   * focus before leaving, else that book's cover link (not its month-chart
+   * chip, which comes first in the DOM but has no text).
+   * preventScroll: jumpTo() owns the scroll position.
+   */
+  function moveFocus(next: string | null, from: string | null): void {
+    const visible = (el: Element | null): el is HTMLElement =>
+      el instanceof HTMLElement &&
+      el.isConnected &&
+      el.getClientRects().length > 0
+    let target: HTMLElement | null | undefined
+    if (next !== null) {
+      target = document.querySelector<HTMLElement>('[data-page-title]')
+    } else if (visible(shelfFocus)) {
+      target = shelfFocus
+    } else if (from !== null) {
+      const links = [
+        ...shelfEl.querySelectorAll<HTMLElement>(`a[href="#/book/${from}"]`),
+      ].filter(visible)
+      target = links.find((el) => el.querySelector('.cover')) ?? links[0]
+    }
+    target?.focus({ preventScroll: true })
+  }
+
   async function onHashChange() {
     const next = parse(location.hash)
     if (next === bookId) return
     const from = bookId
-    if (from === null) shelfY = window.scrollY
+    if (from === null) {
+      shelfY = window.scrollY
+      const active = document.activeElement
+      shelfFocus =
+        active instanceof HTMLElement && shelfEl.contains(active)
+          ? active
+          : null
+    }
 
     const swap = async () => {
       bookId = next
@@ -49,6 +85,7 @@
       jumpTo(next === null ? shelfY : 0)
       // Returning: the cover flies back to its spot on the shelf.
       if (next === null) nameShelfCover(from)
+      moveFocus(next, from)
     }
 
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
