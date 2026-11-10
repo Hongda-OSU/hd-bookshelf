@@ -46,23 +46,26 @@ site never writes data.
 
 ## Gotchas
 
-- Routing is hash-based (`#/book/<id>`) in `src/App.svelte`. The shelf stays
+- Routing is hash-based (`#/book/<id>`, `src/App.svelte`). The shelf stays
   mounted (hidden) while a book is open so its filters survive.
-- Scroll with `jumpTo()` from `src/lib/smooth-scroll.ts`, never
-  `window.scrollTo`: it stops a Lenis ease still in flight and drops trailing
-  trackpad momentum, either of which otherwise scrolls the new page.
-- The shelf→book cover morph uses the view-transition name `book-cover`; only
-  one visible element may hold it at a time (`nameShelfCover` in `App.svelte`).
-- Chinese text has no italic: anything set in italic needs an upright CJK
-  fallback (see `.cjk` classes), or the browser slants the glyphs.
-- The site is named `hd-bookshelf` (tab title, README); the header wordmark
-  deliberately shows "HD Bookshelf" in Cormorant SC.
-- Covers: remote Open Library URLs by cover id. Prefer clean publisher scans;
-  dark user photos vanish on the dark page. Google Books' keyless API is often
-  over quota (HTTP 429).
-- Headless Chrome with `--virtual-time-budget` never delivers scroll events or
-  finishes view transitions. To test those, drive real-time headless Chrome
-  over CDP (`--remote-debugging-port` + Node's built-in WebSocket).
+- Scroll with `jumpTo()` (`src/lib/smooth-scroll.ts`), never `window.scrollTo`:
+  it stops a Lenis ease in flight and drops trailing trackpad momentum.
+- Full-screen overlays (`SurpriseWall`, `SearchSheet`) call `lenis?.stop()`
+  while open, or the wheel scrolls the page beneath.
+- The cover morph uses the view-transition name `book-cover`; one visible
+  element may hold it at a time (`nameShelfCover`).
+- Chinese has no italic: italic text needs an upright CJK fallback (`.cjk`).
+- Phone overrides (`@media (max-width: 600px)`) go last in a component's
+  `<style>`; placed earlier, the base rules after them win.
+- The site is `hd-bookshelf`; the header wordmark deliberately shows
+  "HD Bookshelf" in Cormorant SC.
+- Covers: Open Library URLs by cover id (prefer clean publisher scans; dark
+  photos vanish on the page), or a file in `public/covers/` for editions Open
+  Library lacks, such as Chinese ones. Google Books' keyless API is often 429.
+- Test in real-time headless Chrome over CDP (`--remote-debugging-port` +
+  Node's WebSocket); `--virtual-time-budget` never delivers scroll events or
+  view transitions. For phone widths use `Emulation.setDeviceMetricsOverride`:
+  `--window-size` has a minimum width.
 
 ## Product spec
 
