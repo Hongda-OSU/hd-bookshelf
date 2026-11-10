@@ -9,10 +9,12 @@ site never writes data.
 
 - Runtime: Node 22.18+ (scripts in `scripts/*.ts` run with native type stripping, no tsx)
 - Framework: Svelte 5 + Vite, TypeScript; Lenis for smooth scrolling
+- Fonts: Latin ones self-hosted in `public/fonts/` (preloaded in `index.html`);
+  Noto Serif SC from Google Fonts
 - Package manager: **pnpm** 12, pinned by `packageManager` (not npm, not yarn)
 - Hosting: GitHub Pages, served under `/hd-bookshelf/`. Every push to `main`
   runs `.github/workflows/deploy.yml` (format check, types, build, deploy).
-- Data: one JSON file per book in `data/books/<id>.json`, schema in zod; no backend
+- Data: one JSON file per book in `data/books/<id>.json`, zod schema; no backend
 
 ## Commands
 
@@ -59,13 +61,13 @@ site never writes data.
   `<style>`; placed earlier, the base rules after them win.
 - The site is `hd-bookshelf`; the header wordmark deliberately shows
   "HD Bookshelf" in Cormorant SC.
-- Covers: Open Library URLs by cover id (prefer clean publisher scans; dark
-  photos vanish on the page), or a file in `public/covers/` for editions Open
-  Library lacks, such as Chinese ones. Google Books' keyless API is often 429.
+- Covers live in `public/covers/<id>.jpg` (`pnpm book:lookup save`), from
+  Open Library (prefer clean publisher scans; dark photos vanish) or my own
+  image. Google Books' keyless API is often 429.
 - Test in real-time headless Chrome over CDP (`--remote-debugging-port` +
-  Node's WebSocket); `--virtual-time-budget` never delivers scroll events or
-  view transitions. For phone widths use `Emulation.setDeviceMetricsOverride`:
-  `--window-size` has a minimum width.
+  Node's WebSocket); `--virtual-time-budget` drops scroll events and view
+  transitions. Phone widths: `Emulation.setDeviceMetricsOverride`
+  (`--window-size` has a minimum).
 
 ## Product spec
 
