@@ -60,20 +60,29 @@
     status !== 'reading' && finishedShown.length > 0,
   )
 
-  // The toolbar gets a backdrop only once it is stuck to the top: the
-  // sentinel sits right above it, so once it has scrolled above the viewport
-  // the toolbar is stuck.
   // Footer: one saved sentence picked at random; the sentence list is its own
   // chunk, fetched after the shelf has rendered.
   let quote = $state<Quote | null>(null)
   const CJK = /[\u3400-\u9fff]/
   $effect(() => {
-    import('../generated/quotes.json').then((m) => {
-      const all = m.default as Quote[]
-      if (all.length > 0) quote = all[Math.floor(Math.random() * all.length)]
-    })
+    let live = true
+    import('../generated/quotes.json')
+      .then((m) => {
+        const all = m.default as Quote[]
+        if (live && all.length > 0) {
+          quote = all[Math.floor(Math.random() * all.length)]
+        }
+      })
+      // No quote is fine; the footer just shows the data note.
+      .catch(() => {})
+    return () => {
+      live = false
+    }
   })
 
+  // The toolbar gets a backdrop only once it is stuck to the top: the
+  // sentinel sits right above it, so once it has scrolled above the viewport
+  // the toolbar is stuck.
   let sentinel = $state<HTMLElement>()
   let stuck = $state(false)
   $effect(() => {
