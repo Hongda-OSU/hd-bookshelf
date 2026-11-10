@@ -2,6 +2,7 @@
   import type { IndexEntry, Quote, Status } from '../lib/book'
   import BookTile from '../lib/components/BookTile.svelte'
   import MonthChart from '../lib/components/MonthChart.svelte'
+  import SearchSheet from '../lib/components/SearchSheet.svelte'
   import SiteHeader from '../lib/components/SiteHeader.svelte'
   import { byFinishedDesc, byReadingRecency } from '../lib/order'
   import { bookHref } from '../lib/format'
@@ -22,6 +23,8 @@
   let status = $state<StatusFilter>('all')
   let category = $state(ALL)
   let query = $state('')
+  // Phones hide the search field; an icon opens SearchSheet instead.
+  let searchOpen = $state(false)
 
   const finished = $derived(books.filter((b) => b.status === 'finished'))
   const reading = $derived(books.filter((b) => b.status === 'reading'))
@@ -147,6 +150,18 @@
         >
       {/each}
     </div>
+    <button
+      type="button"
+      class="search-toggle"
+      aria-label="搜索"
+      aria-haspopup="dialog"
+      onclick={() => (searchOpen = true)}
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M20 20l-3.5-3.5"></path>
+      </svg>
+    </button>
     <div class="cats" role="group" aria-label="分类">
       {#each [ALL, ...categories] as name, i (name)}
         {#if i > 0}<span class="sep" aria-hidden="true">/</span>{/if}
@@ -166,6 +181,9 @@
       <input type="search" placeholder="搜书名或作者" bind:value={query} />
     </label>
   </div>
+  {#if searchOpen}
+    <SearchSheet {books} onclose={() => (searchOpen = false)} />
+  {/if}
 
   {#if showReading}
     <section class="group">
@@ -545,5 +563,40 @@
   code {
     font: 400 12px var(--mono);
     color: var(--muted);
+  }
+  .search-toggle {
+    display: none;
+  }
+  /* Phones: the search field becomes a bare icon at the end of the status
+     row (it opens SearchSheet), and categories start their own line.
+     Last in the sheet so these win. */
+  @media (max-width: 600px) {
+    .search-toggle {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      margin: 0 -10px 0 auto;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .search-toggle:hover {
+      color: var(--text);
+    }
+    .search-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+    }
+    .cats {
+      flex: 1 1 100%;
+    }
+    .search {
+      display: none;
+    }
   }
 </style>
