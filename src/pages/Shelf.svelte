@@ -105,12 +105,18 @@
 
   <section class="hero" aria-label="今年概览">
     <!-- Break after the comma so no line starts with the italic "f",
-         whose swash hangs past the left edge. -->
+         whose swash hangs past the left edge. On phones a second break
+         keeps "them." from ending up alone on the last line. -->
     <h1>
       Books I finished,<br />
-      <em>and the lines I kept from them.</em>
+      <em>and the lines<br class="phone" /> I kept from them.</em>
     </h1>
-    <p class="lede">每本书留下读完的月份、一句推荐，和读的时候划下来的句子。</p>
+    <!-- Wrap only between phrases, never inside a word like 推荐. -->
+    <p class="lede">
+      <span>每本书留下读完的月份、</span><span>一句推荐，</span><span
+        >和读的时候划下来的句子。</span
+      >
+    </p>
     <dl class="stats">
       <div>
         <dt>本读完（{year}）</dt>
@@ -243,6 +249,12 @@
   h1 em {
     color: var(--muted);
   }
+  br.phone {
+    display: none;
+  }
+  .lede span {
+    white-space: nowrap;
+  }
   .lede {
     grid-area: lede;
     margin: 18px 0 0;
@@ -279,6 +291,40 @@
     margin-top: 8px;
     font-size: 12px;
     color: var(--muted);
+  }
+  /* Phones: after the base rules above so these win. */
+  @media (max-width: 600px) {
+    br.phone {
+      display: inline;
+    }
+    .hero {
+      padding-top: 40px;
+    }
+    /* The short phone lines all end mid-width; centring balances them. */
+    h1,
+    .lede {
+      text-align: center;
+    }
+    .lede {
+      margin-inline: auto;
+    }
+    .stats > div,
+    .stats > div:first-child {
+      align-items: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    /* Grow with the screen so "Books I finished," nearly fills the line;
+       40px still fits on a 320px phone. */
+    h1 {
+      font-size: clamp(40px, calc(14vw - 6px), 52px);
+    }
+    .lede {
+      font-size: clamp(16px, calc(5.6vw - 2px), 19px);
+    }
+    .stats dd {
+      font-size: 34px;
+    }
   }
 
   .toolbar {
