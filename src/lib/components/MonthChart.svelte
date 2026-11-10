@@ -26,7 +26,10 @@
   </div>
   <div class="grid">
     {#each months as m, i (i)}
-      <div class="col">
+      <div
+        class="col"
+        class:future={currentMonth !== undefined && i + 1 > currentMonth}
+      >
         <div class="stack">
           {#each m.books as b (b.id)}
             <a
@@ -106,6 +109,13 @@
   }
   .label.current {
     color: var(--accent);
+  }
+  /* Months still to come: faded, so "nothing yet" reads apart from "none". */
+  .future .stack {
+    border-bottom-color: var(--line);
+  }
+  .future .label {
+    opacity: 0.35;
   }
   /* Phones: keep the year on one line, months as 1-12. Last, so it wins. */
   .label.short {
