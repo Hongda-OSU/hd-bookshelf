@@ -444,7 +444,7 @@
       auto-fill,
       minmax(clamp(120px, 28vw, 150px), 1fr)
     );
-    gap: 36px 20px;
+    gap: 44px;
   }
 
   .empty {
