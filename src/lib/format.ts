@@ -1,3 +1,11 @@
+import type { Format } from './book'
+
+export const FORMAT_LABEL: Record<Format, string> = {
+  paper: '纸书',
+  ebook: '电子书',
+  audiobook: '有声书',
+}
+
 /** "2026-10" → "2026.10" */
 export function dotMonth(ym: string): string {
   return ym.replace('-', '.')

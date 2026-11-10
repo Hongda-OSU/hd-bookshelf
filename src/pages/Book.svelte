@@ -2,7 +2,7 @@
   import type { Book, IndexEntry } from '../lib/book'
   import Cover from '../lib/components/Cover.svelte'
   import SiteHeader from '../lib/components/SiteHeader.svelte'
-  import { bookHref, cnMonth, dotMonth } from '../lib/format'
+  import { FORMAT_LABEL, bookHref, cnMonth, dotMonth } from '../lib/format'
   import { shelfOrder } from '../lib/order'
 
   let { id, books }: { id: string; books: IndexEntry[] } = $props()
@@ -81,6 +81,12 @@
               {/if}
             </dd>
           </div>
+          {#if entry.format}
+            <div>
+              <dt>形式</dt>
+              <dd>{FORMAT_LABEL[entry.format]}</dd>
+            </div>
+          {/if}
           <div>
             <dt>摘录</dt>
             <dd>{entry.sentenceCount} 句</dd>
@@ -229,6 +235,10 @@
   .facts > div:nth-child(even) {
     padding-left: 14px;
     border-left: 1px solid var(--line);
+  }
+  /* Odd number of facts: the last one (ISBN) takes the whole row. */
+  .facts > div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
   .facts dt {
     font: 400 11px/1 var(--mono);

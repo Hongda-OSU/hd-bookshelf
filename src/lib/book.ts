@@ -25,6 +25,8 @@ const common = {
   cover: z.string().min(1).optional(),
   category: z.string().min(1),
   dateStarted: yearMonth.optional(),
+  /** How I read it. */
+  format: z.enum(['paper', 'ebook', 'audiobook']).optional(),
   recommendation: z.string().min(1).optional(),
   sentences: z.array(SentenceSchema),
 }
@@ -42,6 +44,7 @@ export const BookSchema = z.discriminatedUnion('status', [
 export type Sentence = z.infer<typeof SentenceSchema>
 export type Book = z.infer<typeof BookSchema>
 export type Status = Book['status']
+export type Format = NonNullable<Book['format']>
 
 /** One row of the generated index: a book without its sentences. */
 export type IndexEntry = {
@@ -53,6 +56,7 @@ export type IndexEntry = {
   status: Status
   dateStarted?: string
   dateFinished?: string
+  format?: Format
   recommendation?: string
   sentenceCount: number
   /** Latest sentence, only for books still being read. */

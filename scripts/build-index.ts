@@ -60,6 +60,7 @@ function toEntry(book: Book): IndexEntry {
     category: book.category,
     status: book.status,
     dateStarted: book.dateStarted,
+    format: book.format,
     dateFinished: book.status === 'finished' ? book.dateFinished : undefined,
     recommendation: book.recommendation,
     sentenceCount: book.sentences.length,
