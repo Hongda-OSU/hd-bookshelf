@@ -28,15 +28,21 @@
       </p>
     {/if}
     <div class="meta">
-      <span>
-        {book.dateFinished
-          ? `${dotMonth(book.dateFinished)} · `
-          : book.dateStarted
-            ? `${dotMonth(book.dateStarted)} 开始 · `
-            : ''}{book.category}
-      </span>
-      {#if book.sentenceCount > 0}
-        <span class="count">{book.sentenceCount} 句</span>
+      {#if book.dateFinished && book.sentenceCount === 0}
+        <!-- Nothing for the right side: spread month and category instead. -->
+        <span>{dotMonth(book.dateFinished)}</span>
+        <span>{book.category}</span>
+      {:else}
+        <span>
+          {book.dateFinished
+            ? `${dotMonth(book.dateFinished)} · `
+            : book.dateStarted
+              ? `${dotMonth(book.dateStarted)} 开始 · `
+              : ''}{book.category}
+        </span>
+        {#if book.sentenceCount > 0}
+          <span class="count">{book.sentenceCount} 句</span>
+        {/if}
       {/if}
     </div>
   </div>
