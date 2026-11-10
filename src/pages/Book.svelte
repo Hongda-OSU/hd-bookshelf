@@ -66,6 +66,7 @@
             author={entry.author}
             cover={entry.cover}
             size="lg"
+            priority
           />
         </div>
         <dl class="facts">

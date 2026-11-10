@@ -7,8 +7,17 @@
     author?: string
     cover?: string
     size?: 'sm' | 'md' | 'lg'
+    /** The page's main image: load it right away, ahead of other images. */
+    priority?: boolean
   }
-  let { id, title, author, cover, size = 'md' }: Props = $props()
+  let {
+    id,
+    title,
+    author,
+    cover,
+    size = 'md',
+    priority = false,
+  }: Props = $props()
 
   // Fall back to the placeholder when the image URL is broken.
   let failed = $state(false)
@@ -27,7 +36,13 @@
   aria-hidden="true"
 >
   {#if src}
-    <img {src} alt="" loading="lazy" onerror={() => (failed = true)} />
+    <img
+      {src}
+      alt=""
+      loading={priority ? 'eager' : 'lazy'}
+      fetchpriority={priority ? 'high' : 'auto'}
+      onerror={() => (failed = true)}
+    />
   {:else}
     <span class="mark {ph.variant}"></span>
     <span class="title {ph.variant}">{title}</span>
