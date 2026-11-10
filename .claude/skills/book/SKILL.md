@@ -64,12 +64,16 @@ ask which.
    `cover` to `covers/<id>.jpg` (no leading slash; the site adds the base).
    Mention if it is small (under ~560px wide looks soft on the book page).
    Commit the image together with the JSON.
+   **Cover colour**: once the cover is chosen, run
+   `pnpm -s book:lookup color <coverId or public/covers/<id>.jpg>` and set
+   `coverColor` to its `coverColor` (it tints the month chart). Leave it out
+   when the result is null. Rerun it whenever the cover changes.
 4. **id**: lowercase-hyphen slug of the English title (`bad-blood`); for a
    Chinese title use its English edition title or pinyin, and confirm. The
    file `data/books/<id>.json` must not exist yet.
 5. **Write** `data/books/<id>.json`, omitting unset optional keys, in this
    order:
-   `id title author isbn cover category status dateStarted dateFinished format recommendation sentences`.
+   `id title author isbn cover coverColor category status dateStarted dateFinished format recommendation sentences`.
    `sentences` is `[]` when empty. 2-space indent, UTF-8 (not escaped),
    trailing newline.
 6. Validate, commit, report the commit hash, remind to push.

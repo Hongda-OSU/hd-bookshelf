@@ -57,6 +57,7 @@ function toEntry(book: Book): IndexEntry {
     title: book.title,
     author: book.author,
     cover: book.cover,
+    coverColor: book.coverColor,
     category: book.category,
     status: book.status,
     dateStarted: book.dateStarted,

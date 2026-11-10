@@ -23,6 +23,12 @@ const common = {
     .optional(),
   // Optional: the site draws a placeholder cover when it is missing.
   cover: z.string().min(1).optional(),
+  /** A vivid colour taken from the cover (book-lookup color); tints the
+   *  book's chip in the month chart. */
+  coverColor: z
+    .string()
+    .regex(/^#[0-9a-f]{6}$/, 'expected #rrggbb, lowercase')
+    .optional(),
   category: z.string().min(1),
   dateStarted: yearMonth.optional(),
   /** How I read it. */
@@ -52,6 +58,7 @@ export type IndexEntry = {
   title: string
   author?: string
   cover?: string
+  coverColor?: string
   category: string
   status: Status
   dateStarted?: string

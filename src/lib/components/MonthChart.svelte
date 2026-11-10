@@ -34,8 +34,8 @@
               href={bookHref(b.id)}
               title={b.title}
               aria-label="{b.title}，{i + 1} 月读完"
-              style:--chip-bg={b.ph.bg}
-              style:--chip-mark={b.ph.mark}
+              style:--chip-bg={b.coverColor ?? b.ph.bg}
+              style:--chip-mark={b.coverColor ? '#ffffff' : b.ph.mark}
             ></a>
           {/each}
         </div>

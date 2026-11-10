@@ -4,6 +4,7 @@
 //   pnpm -s book:lookup isbn <isbn>
 //   pnpm -s book:lookup editions <workId>        e.g. OL17892614W
 //   pnpm -s book:lookup covers <coverId> [...]   → contact sheet to pick from
+//   pnpm -s book:lookup color <coverId | path | url> → coverColor for the JSON
 //
 // Read-only: it never touches data/books. Covers are downloaded to a temp dir.
 import { execFileSync } from 'node:child_process'
@@ -238,9 +239,76 @@ function contactSheet(
   return sheet
 }
 
+/** "#rrggbb" → hue-free saturation and lightness, both 0..1. */
+function satLight(hex: string): { s: number; l: number } {
+  const [r, g, b] = [1, 3, 5].map(
+    (i) => parseInt(hex.slice(i, i + 2), 16) / 255,
+  )
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  const s = max === min ? 0 : (max - min) / (1 - Math.abs(2 * l - 1))
+  return { s, l }
+}
+
+/**
+ * A cover's most vivid colour that still shows on the site's near-black
+ * background: reduce the cover to a few colours, drop the very dark and the
+ * near-white ones, then favour saturation, weighted by how much of the cover
+ * it covers. Null when nothing qualifies (the chart keeps its placeholder).
+ */
+async function coverColor(source: string) {
+  let file = source
+  if (/^\d+$/.test(source) || /^https?:\/\//.test(source)) {
+    const url = /^\d+$/.test(source)
+      ? `https://covers.openlibrary.org/b/id/${source}-L.jpg?default=false`
+      : source
+    const res = await fetch(url, { headers: HEADERS })
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`)
+    const dir = path.join(os.tmpdir(), `hd-bookshelf-color-${Date.now()}`)
+    await mkdir(dir, { recursive: true })
+    file = path.join(dir, 'cover')
+    await writeFile(file, Buffer.from(await res.arrayBuffer()))
+  } else if (!existsSync(file)) {
+    throw new Error(`no such file: ${file}`)
+  }
+  const out = execFileSync(
+    'magick',
+    [
+      file,
+      '-resize',
+      '100x150!',
+      '-colors',
+      '8',
+      '-format',
+      '%c',
+      'histogram:info:',
+    ],
+    { encoding: 'utf8' },
+  )
+  const swatches = [...out.matchAll(/^\s*(\d+):.*?(#[0-9A-Fa-f]{6})/gm)].map(
+    (m) => ({ count: Number(m[1]), hex: m[2].toLowerCase() }),
+  )
+  const total = swatches.reduce((n, c) => n + c.count, 0)
+  let best: { hex: string; score: number } | null = null
+  for (const { count, hex } of swatches) {
+    const { s, l } = satLight(hex)
+    if (l < 0.28 || l > 0.85) continue
+    const score = s * Math.sqrt(count / total)
+    if (!best || score > best.score) best = { hex, score }
+  }
+  return {
+    coverColor: best?.hex ?? null,
+    swatches: swatches.map(({ count, hex }) => ({
+      hex,
+      share: Math.round((count / total) * 100) / 100,
+    })),
+  }
+}
+
 const [cmd, ...args] = process.argv.slice(2)
 const usage =
-  'usage: book-lookup <search "<query>" | isbn <isbn> | editions <workId> | covers <coverId>...>'
+  'usage: book-lookup <search "<query>" | isbn <isbn> | editions <workId> | covers <coverId>... | color <coverId|path|url>>'
 
 let result: unknown
 if (cmd === 'search' && args.length > 0) result = await search(args.join(' '))
@@ -248,6 +316,7 @@ else if (cmd === 'isbn' && args[0])
   result = await byIsbn(args[0].replace(/[-\s]/g, ''))
 else if (cmd === 'editions' && args[0]) result = await editions(args[0])
 else if (cmd === 'covers' && args.length > 0) result = await covers(args)
+else if (cmd === 'color' && args[0]) result = await coverColor(args[0])
 else {
   console.error(usage)
   process.exit(2)
