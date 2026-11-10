@@ -16,7 +16,7 @@ not this file.
   words. No drafting, polishing, translating or "suggesting one". If they give
   none, leave the field out.
 - Never invent metadata (author, ISBN, dates). Unknown: ask, or leave it out.
-- Only touch `data/books/`, plus `public/covers/` for a local cover. One book
+- Only touch `data/books/` and the book's image in `public/covers/`. One book
   change per commit.
 - After every write: `pnpm build:index` must pass, then commit. **Never push.**
   Tell the user to push; pushing to `main` deploys the site.
@@ -51,26 +51,22 @@ ask which.
    - `format`: `paper` / `ebook` / `audiobook` (纸书 / 电子书 / 有声书).
    - `category`: list the categories already used in `data/books/` and suggest
      one of them. Propose a new one only when none fits; the user decides.
-3. **Pick a cover.** `pnpm -s book:lookup editions <work>`, choose up to 8
-   cover ids (prefer the edition they read and clean publisher covers), then
-   `pnpm -s book:lookup covers <id> <id> ...` and `open -a Preview <sheet>`.
-   Ask for a number, or "none" (the site then draws a placeholder cover).
-   Warn when the candidates are dark user photos: they look black on this
-   site's dark background. Cover URL:
-   `https://covers.openlibrary.org/b/id/<coverId>-L.jpg`.
-   **Local cover** when Open Library lacks the edition read (e.g. a Chinese
-   edition): ask the user for an image of it, then
-   `magick <image> -strip -quality 88 public/covers/<id>.jpg` and set
-   `cover` to `covers/<id>.jpg` (no leading slash; the site adds the base).
-   Mention if it is small (under ~560px wide looks soft on the book page).
-   Commit the image together with the JSON.
-   **Cover colour**: once the cover is chosen, run
-   `pnpm -s book:lookup color <coverId or public/covers/<id>.jpg>` and set
-   `coverColor` to its `coverColor` (it tints the month chart). Leave it out
-   when the result is null. Rerun it whenever the cover changes.
-4. **id**: lowercase-hyphen slug of the English title (`bad-blood`); for a
+3. **id**: lowercase-hyphen slug of the English title (`bad-blood`); for a
    Chinese title use its English edition title or pinyin, and confirm. The
    file `data/books/<id>.json` must not exist yet.
+4. **Pick a cover and keep it in the repo.** `pnpm -s book:lookup editions <work>`,
+   choose up to 8 cover ids (prefer the edition they read and clean
+   publisher covers), then `pnpm -s book:lookup covers <id> <id> ...` and
+   `open -a Preview <sheet>`. Ask for a number, or "none" (the site then
+   draws a placeholder cover; leave `cover` and `coverColor` out). Warn when
+   the candidates are dark user photos: they look black on this site's dark
+   background. When Open Library lacks the edition read (e.g. a Chinese
+   edition), ask the user for an image of it instead.
+   Then `pnpm -s book:lookup save <coverId or image path> <id>`: it writes
+   `public/covers/<id>.jpg` (metadata stripped) and prints the `cover`
+   (`covers/<id>.jpg`, no leading slash) and `coverColor` to use; leave
+   `coverColor` out when it is null. Mention if the image is under ~560px
+   wide (soft on the book page). Commit the image together with the JSON.
 5. **Write** `data/books/<id>.json`, omitting unset optional keys, in this
    order:
    `id title author isbn cover coverColor category status dateStarted dateFinished format recommendation sentences`.
@@ -92,7 +88,8 @@ use the reply verbatim or leave it out. Validate, commit.
 
 ## `/book edit <book> <field> <value>`
 
-Change one field and keep the rest. `cover`: use the cover flow from `add`.
+Change one field and keep the rest. `cover`: use the cover step from `add`
+(`save` overwrites `public/covers/<id>.jpg`; update `coverColor` too).
 `status` back to `reading`: remove `dateFinished` (the schema rejects it on
 reading books). Validate, commit with `update`.
 

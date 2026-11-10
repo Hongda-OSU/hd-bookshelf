@@ -5,8 +5,11 @@
 //   pnpm -s book:lookup editions <workId>        e.g. OL17892614W
 //   pnpm -s book:lookup covers <coverId> [...]   → contact sheet to pick from
 //   pnpm -s book:lookup color <coverId | path | url> → coverColor for the JSON
+//   pnpm -s book:lookup save <coverId | path | url> <bookId>
+//                                 → public/covers/<bookId>.jpg + its coverColor
 //
-// Read-only: it never touches data/books. Covers are downloaded to a temp dir.
+// It never touches data/books. Only `save` writes to the repo (one image in
+// public/covers/); everything else downloads to a temp dir.
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -257,21 +260,26 @@ function satLight(hex: string): { s: number; l: number } {
  * near-white ones, then favour saturation, weighted by how much of the cover
  * it covers. Null when nothing qualifies (the chart keeps its placeholder).
  */
-async function coverColor(source: string) {
-  let file = source
+/** A cover id, URL or local path → a local file (downloaded to a temp dir). */
+async function localCover(source: string): Promise<string> {
   if (/^\d+$/.test(source) || /^https?:\/\//.test(source)) {
     const url = /^\d+$/.test(source)
       ? `https://covers.openlibrary.org/b/id/${source}-L.jpg?default=false`
       : source
     const res = await fetch(url, { headers: HEADERS })
     if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`)
-    const dir = path.join(os.tmpdir(), `hd-bookshelf-color-${Date.now()}`)
+    const dir = path.join(os.tmpdir(), `hd-bookshelf-cover-${Date.now()}`)
     await mkdir(dir, { recursive: true })
-    file = path.join(dir, 'cover')
+    const file = path.join(dir, 'cover')
     await writeFile(file, Buffer.from(await res.arrayBuffer()))
-  } else if (!existsSync(file)) {
-    throw new Error(`no such file: ${file}`)
+    return file
   }
+  if (!existsSync(source)) throw new Error(`no such file: ${source}`)
+  return source
+}
+
+async function coverColor(source: string) {
+  const file = await localCover(source)
   const out = execFileSync(
     'magick',
     [
@@ -306,9 +314,46 @@ async function coverColor(source: string) {
   }
 }
 
+/**
+ * Keep a cover in the repo: write it as public/covers/<bookId>.jpg with all
+ * metadata stripped (a phone photo can carry its location), and report the
+ * values for the book's JSON.
+ */
+async function saveCover(source: string, bookId: string) {
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(bookId)) {
+    throw new Error(`not a book id: ${bookId}`)
+  }
+  const file = await localCover(source)
+  const out = path.resolve('public/covers', `${bookId}.jpg`)
+  await mkdir(path.dirname(out), { recursive: true })
+  execFileSync('magick', [
+    file,
+    '-auto-orient',
+    '-strip',
+    '-quality',
+    '90',
+    out,
+  ])
+  const [width, height] = execFileSync(
+    'magick',
+    ['identify', '-format', '%w %h', out],
+    { encoding: 'utf8' },
+  )
+    .split(' ')
+    .map(Number)
+  const { coverColor: color } = await coverColor(out)
+  return {
+    file: path.relative(process.cwd(), out),
+    cover: `covers/${bookId}.jpg`,
+    coverColor: color,
+    width,
+    height,
+  }
+}
+
 const [cmd, ...args] = process.argv.slice(2)
 const usage =
-  'usage: book-lookup <search "<query>" | isbn <isbn> | editions <workId> | covers <coverId>... | color <coverId|path|url>>'
+  'usage: book-lookup <search "<query>" | isbn <isbn> | editions <workId> | covers <coverId>... | color <coverId|path|url> | save <coverId|path|url> <bookId>>'
 
 let result: unknown
 if (cmd === 'search' && args.length > 0) result = await search(args.join(' '))
@@ -317,6 +362,8 @@ else if (cmd === 'isbn' && args[0])
 else if (cmd === 'editions' && args[0]) result = await editions(args[0])
 else if (cmd === 'covers' && args.length > 0) result = await covers(args)
 else if (cmd === 'color' && args[0]) result = await coverColor(args[0])
+else if (cmd === 'save' && args[0] && args[1])
+  result = await saveCover(args[0], args[1])
 else {
   console.error(usage)
   process.exit(2)
