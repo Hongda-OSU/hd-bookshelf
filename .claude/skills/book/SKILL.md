@@ -16,7 +16,8 @@ not this file.
   words. No drafting, polishing, translating or "suggesting one". If they give
   none, leave the field out.
 - Never invent metadata (author, ISBN, dates). Unknown: ask, or leave it out.
-- Only touch `data/books/`. One book change per commit.
+- Only touch `data/books/`, plus `public/covers/` for a local cover. One book
+  change per commit.
 - After every write: `pnpm build:index` must pass, then commit. **Never push.**
   Tell the user to push; pushing to `main` deploys the site.
 - Commit messages (the commit-msg hook enforces Conventional Commits and a
@@ -37,7 +38,10 @@ ask which.
 
 1. **Find it.** `pnpm -s book:lookup isbn <ISBN>` or
    `pnpm -s book:lookup search "<title author>"`. Show the top candidates
-   (title, author, first published) and confirm which work it is.
+   (title, author, first published) and confirm which work it is. Open
+   Library rarely has Chinese titles or editions: for a translated book,
+   search by the original title and author instead, and ask which edition
+   the user read (publisher, translator, ISBN from the copyright page).
 2. **Confirm the details in one message**, with what you found filled in:
    - `title`: the short title, without the subtitle unless the user wants it.
    - `author`, `isbn` (ISBN-13 of the edition they read if known, else the
@@ -54,6 +58,12 @@ ask which.
    Warn when the candidates are dark user photos: they look black on this
    site's dark background. Cover URL:
    `https://covers.openlibrary.org/b/id/<coverId>-L.jpg`.
+   **Local cover** when Open Library lacks the edition read (e.g. a Chinese
+   edition): ask the user for an image of it, then
+   `magick <image> -strip -quality 88 public/covers/<id>.jpg` and set
+   `cover` to `covers/<id>.jpg` (no leading slash; the site adds the base).
+   Mention if it is small (under ~560px wide looks soft on the book page).
+   Commit the image together with the JSON.
 4. **id**: lowercase-hyphen slug of the English title (`bad-blood`); for a
    Chinese title use its English edition title or pinyin, and confirm. The
    file `data/books/<id>.json` must not exist yet.
