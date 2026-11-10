@@ -5,7 +5,7 @@
 A personal bookshelf of the books I've read: covers, the month I finished each
 one, why I'd recommend it, and the sentences I kept along the way.
 
-**Demo:** https://hongda-osu.github.io/hd-bookshelf/
+**Demo:** https://hongdalin.blog/hd-bookshelf/
 
 ## Features
 
