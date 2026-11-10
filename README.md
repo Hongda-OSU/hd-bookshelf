@@ -44,8 +44,19 @@ pnpm dev
 
 Open http://localhost:5173/hd-bookshelf/.
 
-To add a book, create `data/books/<id>.json` (fields are defined by `BookSchema`
-in `src/lib/book.ts`), then check it:
+Books are added with the `/book` skill in Claude Code (`.claude/skills/book/`):
+
+```text
+/book add Bad Blood                look it up, pick a cover, write the JSON
+/book quote bad-blood "<sentence>" p. 12
+/book finish bad-blood 2026-10
+/book edit bad-blood category 商业
+```
+
+It validates the data and commits each change, but never pushes.
+
+To add a book by hand, create `data/books/<id>.json` (fields are defined by
+`BookSchema` in `src/lib/book.ts`), then check it:
 
 ```bash
 pnpm build:index

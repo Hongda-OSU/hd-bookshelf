@@ -2,8 +2,8 @@
 
 A read-only personal bookshelf site: each book has a cover, finish month, a
 recommendation, and sentences I saved while reading. Books are JSON files in
-the repo (added by hand for now; a `/book` skill is planned). The site never
-writes data.
+the repo, written by the `/book` skill (`.claude/skills/book/`) or by hand. The
+site never writes data.
 
 ## Stack
 
@@ -25,6 +25,7 @@ writes data.
 | Types                            | `pnpm check`        |
 | Format                           | `pnpm format`       |
 | Format check                     | `pnpm format:check` |
+| Open Library lookup (`/book`)    | `pnpm book:lookup`  |
 
 ## Rules
 
