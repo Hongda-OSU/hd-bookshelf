@@ -39,7 +39,8 @@
             ></a>
           {/each}
         </div>
-        <span class="label" class:current={m.current}>{m.label}</span>
+        <span class="label long" class:current={m.current}>{m.label}</span>
+        <span class="label short" class:current={m.current}>{i + 1}</span>
       </div>
     {/each}
   </div>
@@ -69,11 +70,6 @@
     grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: end;
     gap: 12px 6px;
-  }
-  @media (max-width: 640px) {
-    .grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
   }
   .col {
     display: flex;
@@ -110,5 +106,23 @@
   }
   .label.current {
     color: var(--accent);
+  }
+  /* Phones: keep the year on one line, months as 1-12. Last, so it wins. */
+  .label.short {
+    display: none;
+  }
+  @media (max-width: 640px) {
+    .grid {
+      gap: 0 4px;
+    }
+    .stack {
+      min-height: 44px;
+    }
+    .label.long {
+      display: none;
+    }
+    .label.short {
+      display: inline;
+    }
   }
 </style>
