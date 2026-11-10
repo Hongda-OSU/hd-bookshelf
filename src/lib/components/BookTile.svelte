@@ -35,7 +35,9 @@
             ? `${dotMonth(book.dateStarted)} 开始 · `
             : ''}{book.category}
       </span>
-      <span class="count">{book.sentenceCount} 句</span>
+      {#if book.sentenceCount > 0}
+        <span class="count">{book.sentenceCount} 句</span>
+      {/if}
     </div>
   </div>
 </a>
